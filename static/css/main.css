@@ -1,8 +1,14 @@
 html, body {
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-family: 'Roboto', 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-weight: 300;
     color: white;
     background-color: #2C2F33;
     margin: 0px;
+}
+
+h1 {
+    font-size: 2em;
+    font-weight: 200;
 }
 
 header {
@@ -115,7 +121,7 @@ a {
     overflow: hidden;
     display: grid;
     grid-template-rows: 100%;
-    grid-template-columns: auto 200px;
+    grid-template-columns: 600px 200px;
     grid-template-areas: "chat list";
 }
 
@@ -135,7 +141,7 @@ a {
 }
 
 .tabs>button {
-    color: rgba(255, 255, 255, 0.8);
+    color: rgba(255, 255, 255, 0.7);
     margin: 0;
     box-sizing: border-box;
     font-size: 1em;
@@ -158,12 +164,25 @@ a {
 }
 
 .box-pre {
-    overflow: scroll;
+    overflow: auto;
     flex: 1 1 auto;
     position: relative;
     margin: 0;
     width: 100%;
     white-space: pre;
+    font-size: 14px;
+    font-family: monospace;
+    color: rgba(255, 255, 255, 0.7);
+    box-sizing: border-box;
+    padding: 8px;
+}
+
+#console {
+    display: none;
+}
+
+span.att {
+    color: rgba(255, 255, 255, 0.4)
 }
 
 .list {
