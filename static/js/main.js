@@ -28,6 +28,9 @@ window.addEventListener('load', () => {
         cons.innerHTML += txt
         cons.scrollTo(0, cons.scrollHeight)
     })
+    socket.on('listUpdate', () => {
+        updateList()
+    })
 })
 
 function updateStatus(status) {
@@ -42,10 +45,15 @@ function updateStatus(status) {
     if (status == 'online') {
         stop.style.display = 'block'
         reboot.style.display = 'block'
-    } else if (status == 'offline') {
-        start.style.display = 'block'
-    } else if (status == 'booting') {
-        clearPres()
+        updateList()
+    } else {
+        document.querySelectorAll('#on-num>span')[1].innerHTML = 'offline'
+        document.querySelector('.list>ul').innerHTML = ''
+        if (status == 'offline') {
+            start.style.display = 'block'
+        } else if (status == 'booting') {
+            clearPres()
+        }
     }
 }
 
@@ -54,4 +62,15 @@ function clearPres() {
     for (box of document.getElementsByClassName('box-pre')) {
         box.innerHTML = '<span class="att">Console attached: ' + date + '</span>\r'
     }
+}
+
+function updateList() {
+    fetch('/list').then(async res => {
+        let ls = await res.json()
+        document.querySelectorAll('#on-num>span')[1].innerHTML = ls.len + '/' + ls.max
+        document.querySelector('.list>ul').innerHTML = ''
+        for (const player of ls.players) {
+            document.querySelector('.list>ul').innerHTML += player
+        }
+    })
 }

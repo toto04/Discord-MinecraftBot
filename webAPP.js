@@ -7,9 +7,11 @@ module.exports = (server) => {
     server.on('statusChange', (s) => {
         io.emit('statusChange', s)
     })
-
     server.on('console', (t) => {
         io.emit('console', t)
+    })
+    server.on('listUpdate', () => {
+        io.emit('listUpdate')
     })
 
     app.post('/start', (req, res) => {

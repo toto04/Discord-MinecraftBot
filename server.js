@@ -34,6 +34,7 @@ class Server extends EventEmitter {
         this.process.stdout.on('data', data => {
             data = data.toString()
             this.log(data)
+            if (data.includes('joined') | data.includes('left')) this.emit('listUpdate')
             if (data.substring(10, 37) == ' [Server thread/INFO]: Done') this._setStatus('online')
         })
         this.process.stderr.on('data', data => {
