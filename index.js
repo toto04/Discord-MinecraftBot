@@ -1,7 +1,8 @@
 require('dotenv').config()
 
 const Discord = require('discord.js')
-const webApp = require('./api.js')
+const mcServer = require('./server.js')
+const webApp = require('./webAPP.js')(mcServer)
 const client = new Discord.Client()
 const port = process.env.SERVER_PORT || 2580
 
