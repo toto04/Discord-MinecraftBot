@@ -1,4 +1,5 @@
 mcServer/
+.vscode/
 
 # Logs
 logs

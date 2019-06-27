@@ -3,6 +3,7 @@ require('dotenv').config()
 const Discord = require('discord.js')
 const webApp = require('./api.js')
 const client = new Discord.Client()
+const port = process.env.SERVER_PORT || 2580
 
 client.on('message', message => {
     if (!message.guild) return
@@ -25,7 +26,6 @@ client.on('ready', () => {
     console.log(`Client logged in as ${client.user.tag}`)
 })
 
-let port = process.env.SERVER_PORT || 2580
 webApp.listen(port, () => {
     console.log(`Server listening on port ${port}`)
 })

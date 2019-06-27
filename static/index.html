@@ -1,22 +1,36 @@
 <html>
-    <head>
-        <link rel="stylesheet" href="/css/main.css">
-        <script src="/js/main.js"></script>
-        <title>Discord - Minecraft Bot</title>
-    </head>
-    <body>
-        <header>
-            <h1>Discord - Minecraft Bot</h1>
-        </header>
-        <section id='content'>
-            <div class='content-header'>
-                <h1 id='server-status'>Offline</h1>
-                <div id='start'></div>
-                <div id='stop'></div>
-                <div id='reboot'></div>
+
+<head>
+    <link rel="stylesheet" href="/css/main.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+        integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="/js/main.js"></script>
+    <title>Discord - Minecraft Bot</title>
+</head>
+
+<body>
+    <header>
+        <h1>Discord - Minecraft Bot</h1>
+    </header>
+    <section id='content-wrapper'>
+        <div class='content-header'>
+            <h1 id='server-status'>Offline</h1>
+            <div id='start'></div>
+            <div id='stop'></div>
+            <div id='reboot'></div>
+        </div>
+        <div class='content'>
+            <div class='content-box chat-box'></div>
+            <div class='content-box list'>
+                <div id='on-num'>0/20</div>
+                <ul>
+                    <li>toto04_1</li>
+                    <li>Purple__Haze</li>
+                </ul>
             </div>
-            asdasdas
-        </section>
-        <footer>by <a href="https://github.com/toto04">Tommaso Morganti</a></footer>
-    </body>
+        </div>
+    </section>
+    <footer>Repo on <a href="https://github.com/toto04/Discord-MinecraftBot/">GitHub</a></footer>
+</body>
+
 </html>
