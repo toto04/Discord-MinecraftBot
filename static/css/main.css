@@ -112,6 +112,7 @@ a {
 .content {
     height: 50%;
     max-height: 500px;
+    overflow: hidden;
     display: grid;
     grid-template-rows: 100%;
     grid-template-columns: auto 200px;
@@ -123,7 +124,46 @@ a {
 }
 
 .chat-box {
+    display: flex;
+    flex-flow: column;
     grid-area: chat;
+}
+
+.tabs {
+    border-bottom: 1px solid rgba(4, 4, 5, 0.3);
+    box-sizing: border-box;
+}
+
+.tabs>button {
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 1em;
+    padding: 10px;
+    background-color: #2C2F33;
+    border: 0;
+    outline: 0.5px solid rgba(4, 4, 5, 0.3);
+    cursor: pointer;
+}
+
+.tabs>button.active {
+    color: white;
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 1em;
+    padding: 10px;
+    background-color: #2C2F33;
+    border: 0;
+    outline: 0.5px solid rgba(4, 4, 5, 0.3);
+}
+
+.box-pre {
+    overflow: scroll;
+    flex: 1 1 auto;
+    position: relative;
+    margin: 0;
+    width: 100%;
+    white-space: pre;
 }
 
 .list {
@@ -136,13 +176,13 @@ a {
     border-bottom: 1px solid rgba(4, 4, 5, 0.3);
 }
 
-.list > ul {
+.list>ul {
     list-style: none;
 }
 
 @media (max-width: 800px) {
     .content {
-        grid-template-rows: auto auto;
+        grid-template-rows: auto 1fr;
         grid-template-columns: 100%;
         grid-template-areas: "list" "chat";
     }
