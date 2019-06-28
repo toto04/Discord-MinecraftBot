@@ -199,6 +199,21 @@ span.att {
     list-style: none;
 }
 
+form {
+    margin: 0;
+}
+
+#sender {
+    background-color: transparent;
+    border: 0.5px solid rgba(4, 4, 5, 0.3);
+    color: white;
+    height: 30px;
+    width: 100%;
+    position: relative;
+    top: auto;
+    bottom: 0;
+}
+
 @media (max-width: 800px) {
     .content {
         grid-template-rows: auto 1fr;

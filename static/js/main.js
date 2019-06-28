@@ -18,15 +18,19 @@ window.addEventListener('load', () => {
         console.log(await stopped.text())
     })
 
-    var socket = io()
+    socket = io()
     socket.on('statusChange', (status) => {
         updateStatus(status)
     })
     socket.on('console', (txt) => {
-        console.log(txt)
         let cons = document.getElementById('console')
         cons.innerHTML += txt
         cons.scrollTo(0, cons.scrollHeight)
+    })
+    socket.on('chat', (player, text) => {
+        let chat = document.getElementById('chat')
+        chat.innerHTML += player + ': ' + text + '\n'
+        chat.scrollTo(0, chat.scrollHeight)
     })
     socket.on('listUpdate', () => {
         updateList()

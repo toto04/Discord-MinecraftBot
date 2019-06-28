@@ -3,7 +3,21 @@ const app = express()
 const httpServer = require('http').createServer(app)
 const io = require('socket.io')(httpServer)
 
-module.exports = (server) => {
+module.exports = server => {
+    io.on('connection', socket => {
+        socket.on('newMessage', msg => {
+            server.say(msg)
+        })
+
+        socket.on('newCommand', cmd => {
+            if (process.env.WEB_COMMANDS != 'true') {
+                socket.emit('console', 'cannot execute command: not permitted\n')
+                return
+            }
+            server.command(cmd)
+        })
+    })
+
     server.on('statusChange', (s) => {
         io.emit('statusChange', s)
     })
@@ -12,6 +26,10 @@ module.exports = (server) => {
     })
     server.on('listUpdate', () => {
         io.emit('listUpdate')
+    })
+    server.on('chat', (player, text) => {
+        console.log(player, text)
+        io.emit('chat', player, text)
     })
 
     app.post('/start', (req, res) => {

@@ -1,4 +1,4 @@
-const EventEmitter = require('events');
+const EventEmitter = require('events')
 const cp = require('child_process')
 const fs = require('fs')
 
@@ -35,6 +35,12 @@ class Server extends EventEmitter {
             data = data.toString()
             this.log(data)
             if (data.includes('joined') | data.includes('left')) this.emit('listUpdate')
+            let match = data.match(/\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (?:\[([^\]]+)\]|<([^>]+)>) (.+)/)
+            if (match) {
+                if (match[1]) this.emit('chat', match[1], match[3])
+                else this.emit('chat', match[2], match[3])
+
+            }
             if (data.substring(10, 37) == ' [Server thread/INFO]: Done') this._setStatus('online')
         })
         this.process.stderr.on('data', data => {
@@ -54,7 +60,7 @@ class Server extends EventEmitter {
     }
 
     logln(txt) {
-        this.log(txt + '\r')
+        this.log(txt + '\n')
     }
 
     stop() {
@@ -71,15 +77,28 @@ class Server extends EventEmitter {
             this.process.stdin.write('list\r')
             this.process.stdout.once('data', (data) => {
                 let match = data.toString().match(/\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: There are (\d+) of a max (\d+) players online:(.{0,})/)
-                let players = match[3].substring(1).split(", ")
-                let obj = {
-                    len: match[1],
-                    max: match[2],
-                    players
+                if (match) {
+                    let players = match[3].substring(1).split(", ")
+                    let obj = {
+                        len: match[1],
+                        max: match[2],
+                        players
+                    }
+                    resolve(obj)
+                } else {
+                    resolve('server offline') // very poor error handling
                 }
-                resolve(obj)
             })
         })
+    }
+
+    command(cmd) {
+        if (this.status != 'online') return this.logln('cannot execute command: server offline')
+        this.process.stdin.write(cmd + '\r')
+    }
+
+    say(msg) {
+        this.command('say ' + msg)
     }
 }
 
