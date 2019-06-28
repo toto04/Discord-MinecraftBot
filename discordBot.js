@@ -3,6 +3,7 @@ Discord.Client.prototype.log = (txt) => {
     console.log('[discordBot] ' + txt)
 }
 const client = new Discord.Client()
+var OPs = []
 
 module.exports = server => {
     server.on('chat', (player, text) => {
@@ -16,7 +17,7 @@ module.exports = server => {
     client.on('message', async message => {
         if (!message.guild) return  // returns if sender is the bot
         if (!message.content.startsWith(process.env.COMMAND_PREFIX)) {
-            // if not a command
+            // TODO: handle discord chat and import it in minecraft
         } else {
             // gets command and payload from the message, separated by a space
             let cmd, payload = ''
@@ -26,7 +27,11 @@ module.exports = server => {
                 cmd = message.content.substring(1, message.content.indexOf(' '))
                 payload = message.content.substring(message.content.indexOf(' ') + 1, message.content.length)
             }
-    
+
+            client.log(`<${message.author.username}> command: ${cmd}, payload: ${payload}, `)
+
+            // TODO: implement channel binding
+
             switch (cmd) {
                 // list of commands
                 case 'start':
@@ -39,29 +44,37 @@ module.exports = server => {
                     message.channel.send(`Server is currently ${server.status}`)
                     break
                 case 'list':
+                    // TODO: check if it works
                     let res = await server.list()
                     let msg
-                    if (typeof(res) == 'string') {
+                    if (typeof (res) == 'string') {
                         msg = res
                     } else {
-                        msg = `${res}`
+                        msg = `${res.len} of ${res.max} online:`
+                        for (const player of res.players) {
+                            msg += `\n- ${player}`
+                        }
                     }
-                    message.channel.send()
+                    message.channel.send(msg)
                     break
-                case 'command':
+                case '/':
+                    // TODO: check permissions
+                    if (!OPs.includes(message.author.id)) {
+                        message.channel.send('You are not allowed to use commands')
+                        return
+                    }
                     server.command(payload)
                     break
                 default:
                     message.channel.send(`Unknown command, type ${process.env.COMMAND_PREFIX}help to get available commands`)
                     return
             }
-    
-            client.log(`<${message.author.username}> command: ${cmd}, payload: ${payload}, `)
         }
     })
 
     client.on('ready', () => {
         client.log(`Logged in as ${client.user.tag}`)
+        OPs = process.env.ADMIN_IDS.split(',')
     })
 
     return client
