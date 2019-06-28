@@ -13,7 +13,7 @@ class Server extends EventEmitter {
     _setStatus(s) {
         this.status = s
         this.emit('statusChange', s)
-        this.logln('Status set tosay  ' + s)
+        this.logln('Status set to ' + s)
     }
 
     start() {
@@ -77,6 +77,7 @@ class Server extends EventEmitter {
     }
 
     list() {
+        // TODO rework
         return new Promise((resolve, reject) => {
             if (this.status != 'online' || !this.process) {
                 resolve('server offline')

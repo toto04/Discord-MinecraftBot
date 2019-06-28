@@ -7,17 +7,55 @@ var OPs = []
 
 module.exports = server => {
     server.on('chat', (player, text) => {
+        // sends minecraft messages over to discord
         const cID = process.env.CHANNEL_ID
         if (!cID) return
         const ch = client.channels.get(cID)
-        if (ch) ch.send(`[minecraft] ${player}: ${text}`)
+        if (ch && player != 'Server') ch.send(`[minecraft] ${player}: ${text}`)
         else client.log('No channel for given id, change CHANNEL_ID in .env file')
+    })
+    server.on('statusChange', s => {
+        if (s == 'online') {
+            client.user.setPresence({
+                status: 'online'
+            })
+        } else if (s == 'offline') {
+            client.user.setPresence({
+                status: 'dnd',
+                game: {
+                    name: 'Server offline'
+                }
+            })
+        } else {
+            client.user.setPresence({
+                status: 'idle',
+                game: {
+                    name: `Server ${s}`
+                }
+            })
+        }
+    })
+    server.on('listUpdate', async () => {
+        let res = await server.list()
+        let msg = `Server ${server.status}\n${res.len} of ${res.max} online:`
+        for (const player of res.players) {
+            msg += `\n- ${player}`
+        }
+        client.user.setPresence({
+            game: {
+                name: msg
+            }
+        })
     })
 
     client.on('message', async message => {
-        if (!message.guild) return  // returns if sender is the bot
+        if (message.author == client.user) return // returns if sender is the bot
+        const cID = process.env.CHANNEL_ID
+        if (cID && cID != message.channel.id && process.env.BIND_TO_CHANNEL == 'true') return //channel is not the one bound
         if (!message.content.startsWith(process.env.COMMAND_PREFIX)) {
-            // TODO: handle discord chat and import it in minecraft
+            // sends discord messages over to minecraft
+            if (server.status != 'online') return
+            server.say(`<${message.author.username}> ${message.content}`)
         } else {
             // gets command and payload from the message, separated by a space
             let cmd, payload = ''
@@ -28,9 +66,7 @@ module.exports = server => {
                 payload = message.content.substring(message.content.indexOf(' ') + 1, message.content.length)
             }
 
-            client.log(`<${message.author.username}> command: ${cmd}, payload: ${payload}, `)
-
-            // TODO: implement channel binding
+            client.log(`<${message.author.username}> command: ${cmd}, payload: ${payload}`)
 
             switch (cmd) {
                 // list of commands
@@ -44,7 +80,6 @@ module.exports = server => {
                     message.channel.send(`Server is currently ${server.status}`)
                     break
                 case 'list':
-                    // TODO: check if it works
                     let res = await server.list()
                     let msg
                     if (typeof (res) == 'string') {
@@ -65,6 +100,10 @@ module.exports = server => {
                     }
                     server.command(payload)
                     break
+                case 'help':
+                    // TODO: help
+                    message.channel.send('Elia culo ti attacchi')
+                    break
                 default:
                     message.channel.send(`Unknown command, type ${process.env.COMMAND_PREFIX}help to get available commands`)
                     return
@@ -75,6 +114,14 @@ module.exports = server => {
     client.on('ready', () => {
         client.log(`Logged in as ${client.user.tag}`)
         OPs = process.env.ADMIN_IDS.split(',')
+
+        client.user.setPresence({
+            status: 'dnd',
+            game: {
+                name: 'Server offline',
+                type: 'PLAYING'
+            }
+        })
     })
 
     return client

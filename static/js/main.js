@@ -74,7 +74,7 @@ function updateList() {
         document.querySelectorAll('#on-num>span')[1].innerHTML = ls.len + '/' + ls.max
         document.querySelector('.list>ul').innerHTML = ''
         for (const player of ls.players) {
-            document.querySelector('.list>ul').innerHTML += player
+            document.querySelector('.list>ul').innerHTML += `<li>${player}<li>`
         }
     })
 }
