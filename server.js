@@ -1,4 +1,5 @@
 const EventEmitter = require('events')
+const prepareServer = require('./downloader.js')
 const cp = require('child_process')
 const fs = require('fs')
 
@@ -12,13 +13,18 @@ class Server extends EventEmitter {
     _setStatus(s) {
         this.status = s
         this.emit('statusChange', s)
-        this.logln('Status is now: ' + s)
+        this.logln('Status set tosay  ' + s)
     }
 
     start() {
         if (this.status != 'offline') return 'Server already running!'
         if (!fs.existsSync(__dirname + '/mcServer/server.jar')) {
-            return 'Server does not exist'
+            prepareServer().then(() => {
+                this._setStatus('offline')
+                this.start()
+            })
+            this._setStatus('downloading')
+            return 'Downloading jar file...'
         }
 
         this.process = cp.spawn(
@@ -51,7 +57,7 @@ class Server extends EventEmitter {
             this._setStatus('offline')
         })
 
-        return 'Server starting'
+        return 'Server starting...'
     }
 
     log(txt) {
@@ -64,9 +70,10 @@ class Server extends EventEmitter {
     }
 
     stop() {
-        if (this.status == 'offline' || this.status == 'stopping' || !this.process) return 'Server already offline!'
+        if (this.status != 'online' || !this.process) return `Server is ${this.status}`
         this._setStatus('stopping')
         this.process.stdin.write('stop\r')
+        return 'Server stopping...'
     }
 
     list() {

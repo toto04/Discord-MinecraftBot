@@ -28,7 +28,6 @@ module.exports = server => {
         io.emit('listUpdate')
     })
     server.on('chat', (player, text) => {
-        console.log(player, text)
         io.emit('chat', player, text)
     })
 

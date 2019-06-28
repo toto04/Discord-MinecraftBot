@@ -6,8 +6,10 @@ const webApp = require('./webAPP.js')(mcServer)
 const port = process.env.SERVER_PORT || 2580
 
 process.stdin.on('data', (data) => {
-    data = data.toString()
-    mcServer.stdin.write(data + '\r')
+    if (mcServer.process) {
+        data = data.toString()
+        mcServer.process.stdin.write(data)    
+    }
 })
 
 webApp.listen(port, () => {
