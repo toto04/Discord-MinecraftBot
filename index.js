@@ -6,6 +6,7 @@ const webApp = require('./webAPP.js')(mcServer)
 const port = process.env.SERVER_PORT || 2580
 
 process.stdin.on('data', (data) => {
+    // passes the console input to the minecraft console
     if (mcServer.process) {
         data = data.toString()
         mcServer.process.stdin.write(data)    

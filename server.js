@@ -11,6 +11,7 @@ class Server extends EventEmitter {
     }
 
     _setStatus(s) {
+        // function called internally to update status
         this.status = s
         this.emit('statusChange', s)
         this.logln('Status set to ' + s)
@@ -19,6 +20,7 @@ class Server extends EventEmitter {
     start() {
         if (this.status != 'offline') return 'Server already running!'
         if (!fs.existsSync(__dirname + '/mcServer/server.jar')) {
+            // creates the folder and downloads the latest server.jar file, restarts when finished
             prepareServer().then(() => {
                 this._setStatus('offline')
                 this.start()
@@ -28,6 +30,7 @@ class Server extends EventEmitter {
         }
 
         this.process = cp.spawn(
+            // runs the server
             "java",
             ['-Xms1024M', '-Xmx1024M', '-jar', 'server.jar', 'nogui'],
             {
@@ -38,6 +41,7 @@ class Server extends EventEmitter {
         this._setStatus('booting')
 
         this.process.stdout.on('data', data => {
+            // parses useful stuff when the server process outputs something
             data = data.toString()
             this.log(data)
             if (data.includes('joined') | data.includes('left')) this.emit('listUpdate')
@@ -70,6 +74,7 @@ class Server extends EventEmitter {
     }
 
     stop() {
+        // stops the server
         if (this.status != 'online' || !this.process) return `Server is ${this.status}`
         this._setStatus('stopping')
         this.process.stdin.write('stop\r')
@@ -77,7 +82,10 @@ class Server extends EventEmitter {
     }
 
     list() {
-        // TODO rework
+        // asynchronously returns an object containing:
+        // len: number of players online
+        // max: max number of players online
+        // players: array of the players' usernames
         return new Promise((resolve, reject) => {
             if (this.status != 'online' || !this.process) {
                 resolve('server offline')
@@ -101,6 +109,7 @@ class Server extends EventEmitter {
     }
 
     command(cmd) {
+        // submits a given command to the server stdin
         if (this.status != 'online') return this.logln('cannot execute command: server offline')
         this.process.stdin.write(cmd + '\r')
     }

@@ -3,7 +3,7 @@ Discord.Client.prototype.log = (txt) => {
     console.log('[discordBot] ' + txt)
 }
 const client = new Discord.Client()
-var OPs = []
+var OPs = []    // array of admins' IDs
 
 module.exports = server => {
     server.on('chat', (player, text) => {
@@ -15,6 +15,7 @@ module.exports = server => {
         else client.log('No channel for given id, change CHANNEL_ID in .env file')
     })
     server.on('statusChange', s => {
+        // changes the presence according to current server status
         if (s == 'online') {
             client.user.setPresence({
                 status: 'online'
@@ -36,6 +37,7 @@ module.exports = server => {
         }
     })
     server.on('listUpdate', async () => {
+        // updates presence according to player list
         let res = await server.list()
         let msg = `Server ${server.status}\n${res.len} of ${res.max} online:`
         for (const player of res.players) {
@@ -69,7 +71,7 @@ module.exports = server => {
             client.log(`<${message.author.username}> command: ${cmd}, payload: ${payload}`)
 
             switch (cmd) {
-                // list of commands
+                // commands
                 case 'start':
                     message.channel.send(server.start())
                     break
@@ -93,7 +95,6 @@ module.exports = server => {
                     message.channel.send(msg)
                     break
                 case '/':
-                    // TODO: check permissions
                     if (!OPs.includes(message.author.id)) {
                         message.channel.send('You are not allowed to use commands')
                         return
@@ -101,8 +102,22 @@ module.exports = server => {
                     server.command(payload)
                     break
                 case 'help':
-                    // TODO: help
-                    message.channel.send('Elia culo ti attacchi')
+                    let cp = process.env.COMMAND_PREFIX
+                    message.channel.send(
+                        new Discord.RichEmbed()
+                            .setColor(`#FF9900`)
+                            .setTitle(`Command list`)
+                            .addField(`${cp}start`, `executes the server.jar file, downloads first it if missing`)
+                            .addField(`${cp}stop`, `stops the server process if running, by issuing the "/stop" minecraft command`)
+                            .addField(`${cp}status`, `returns the current server status (downloading, booting, online, stopping, offline)`)
+                            .addField(`${cp}list`, `if the server is running, lists all online players`)
+                            .addField(
+                                `${cp}/ [command] [arguments]`,
+                                `submits a command to the server's stdin, only available to admins listed in the .env file\n` +
+                                `For example the command '${process.env.COMMAND_PREFIX}/ say hi' will result in '[Server] hi' in the minecraft chat`
+                            )
+                            .setAuthor('view this project on github', 'https://github.com/toto04.png', 'https://github.com/toto04/Discord-MinecraftBot')
+                    )
                     break
                 default:
                     message.channel.send(`Unknown command, type ${process.env.COMMAND_PREFIX}help to get available commands`)
@@ -113,7 +128,7 @@ module.exports = server => {
 
     client.on('ready', () => {
         client.log(`Logged in as ${client.user.tag}`)
-        OPs = process.env.ADMIN_IDS.split(',')
+        if (process.env.ADMIN_IDS) OPs = process.env.ADMIN_IDS.split(',')
 
         client.user.setPresence({
             status: 'dnd',

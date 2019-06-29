@@ -5,6 +5,7 @@ const io = require('socket.io')(httpServer)
 
 module.exports = server => {
     io.on('connection', socket => {
+        // incoming messages
         socket.on('newMessage', msg => {
             server.say(msg)
         })
@@ -18,6 +19,7 @@ module.exports = server => {
         })
     })
 
+    // reroutes the events for the web app
     server.on('statusChange', (s) => {
         io.emit('statusChange', s)
     })
@@ -31,18 +33,16 @@ module.exports = server => {
         io.emit('chat', player, text)
     })
 
+    // api endpoints
     app.post('/start', (req, res) => {
         res.send(server.start())
     })
-
     app.post('/stop', (req, res) => {
         res.send(server.stop())
     })
-
     app.get('/status', (req, res) => {
         res.send(server.status)
     })
-
     app.get('/list', async (req, res) => {
         res.send(JSON.stringify(await server.list()))
     })

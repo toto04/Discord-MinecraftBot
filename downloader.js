@@ -3,6 +3,8 @@ const fs = require('fs')
 const readline = require('readline')
 
 function prepareServer() {
+    // this function searches for the latest version in the version_manifest.json used by minecraft's launcher
+    // then looks for the download link for the server .jar executable and downloads it
     return new Promise((resolve, reject) => {
         console.log('[downloader] Preparing server.jar! The server will start when the download is finished')
         const dir = './mcServer'
@@ -17,6 +19,7 @@ function prepareServer() {
         })
         var url = 'https://launchermeta.mojang.com/mc/game/version_manifest.json'
         https.get(url, res => {
+            // ahh yes, callback hell ( ͡° ͜ʖ ͡°)
             console.log('[downloader] retrieving latest version!')
             let rawData = ''
             res.on('data', chunk => {
