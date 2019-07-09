@@ -18,3 +18,7 @@ webApp.listen(port, () => {
 })
 
 client.login(process.env.BOT_TOKEN)
+
+client.on('error', (e) => {
+    console.error(e)
+})

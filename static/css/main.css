@@ -77,7 +77,7 @@ a {
 }
 
 #reboot {
-    display: none;
+    display: none !important; /* temporary solution for not having a reboot function */
     position: absolute;
     top: 0;
     left: auto;
