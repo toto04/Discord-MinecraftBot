@@ -8,6 +8,11 @@ class Server extends EventEmitter {
         super()
         this.status = 'offline'
         this.process = null
+        this.list = {
+            num: null,
+            max: null,
+            players: []
+        }
     }
 
     _setStatus(s) {
@@ -15,6 +20,46 @@ class Server extends EventEmitter {
         this.status = s
         this.emit('statusChange', s)
         this.logln('Status set to ' + s)
+    }
+
+    _updateList() {
+        // asynchronously returns an object containing:
+        // len: number of players online
+        // max: max number of players online
+        // players: array of the players' usernames
+        let pro = new Promise((resolve, reject) => {
+            if (this.status != 'online' || !this.process) {
+                this.list = {
+                    num: null,
+                    max: null,
+                    players: []
+                }
+            }
+            this.process.stdin.write('list\r')
+            this.process.stdout.once('data', (data) => {
+                let match = data.toString().match(/\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: There are (\d+) of a max (\d+) players online:(.{0,})/)
+                if (match) {
+                    let players = match[3].substring(1).split(", ")
+                    this.list = {
+                        len: match[1],
+                        max: match[2],
+                        players
+                    }
+                    resolve()
+                } else {
+                    this.list = {
+                        len: null,
+                        max: null,
+                        players: []
+                    }
+                    resolve() // very poor error handling
+                }
+            })
+        })
+        pro.then(() => {
+            this.emit('listUpdate')
+        })
+        return pro
     }
 
     start() {
@@ -44,12 +89,11 @@ class Server extends EventEmitter {
             // parses useful stuff when the server process outputs something
             data = data.toString()
             this.log(data)
-            if (data.includes('joined') | data.includes('left')) this.emit('listUpdate')
+            if (data.includes('joined') | data.includes('left')) this._updateList()
             let match = data.match(/\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (?:\[([^\]]+)\]|<([^>]+)>) (.+)/)
             if (match) {
                 if (match[1]) this.emit('chat', match[1], match[3])
                 else this.emit('chat', match[2], match[3])
-
             }
             if (data.substring(10, 37) == ' [Server thread/INFO]: Done') this._setStatus('online')
         })
@@ -79,33 +123,6 @@ class Server extends EventEmitter {
         this._setStatus('stopping')
         this.process.stdin.write('stop\r')
         return 'Server stopping...'
-    }
-
-    list() {
-        // asynchronously returns an object containing:
-        // len: number of players online
-        // max: max number of players online
-        // players: array of the players' usernames
-        return new Promise((resolve, reject) => {
-            if (this.status != 'online' || !this.process) {
-                resolve('server offline')
-            }
-            this.process.stdin.write('list\r')
-            this.process.stdout.once('data', (data) => {
-                let match = data.toString().match(/\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: There are (\d+) of a max (\d+) players online:(.{0,})/)
-                if (match) {
-                    let players = match[3].substring(1).split(", ")
-                    let obj = {
-                        len: match[1],
-                        max: match[2],
-                        players
-                    }
-                    resolve(obj)
-                } else {
-                    resolve('server offline') // very poor error handling
-                }
-            })
-        })
     }
 
     command(cmd) {

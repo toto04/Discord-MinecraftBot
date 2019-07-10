@@ -44,7 +44,7 @@ module.exports = server => {
         res.send(server.status)
     })
     app.get('/list', async (req, res) => {
-        res.send(JSON.stringify(await server.list()))
+        res.send(JSON.stringify(server.list))
     })
 
     app.use(express.static('static'))

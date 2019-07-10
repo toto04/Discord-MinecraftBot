@@ -36,9 +36,9 @@ module.exports = server => {
             })
         }
     })
-    server.on('listUpdate', async () => {
+    server.on('listUpdate', () => {
         // updates presence according to player list
-        let res = await server.list()
+        let res = server.list
         let msg = `Server ${server.status}\n${res.len} of ${res.max} online:`
         for (const player of res.players) {
             msg += `\n- ${player}`
