@@ -5,6 +5,10 @@ const io = require('socket.io')(httpServer)
 
 module.exports = server => {
     io.on('connection', socket => {
+        let ip = socket.handshake.address
+        if (ip.startsWith('::ffff:')) ip = ip.substring(7)
+        console.log(`[webApp] Client connected with ip ${ip}`)
+
         // incoming messages
         socket.on('newMessage', msg => {
             server.say(msg)

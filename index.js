@@ -14,7 +14,7 @@ process.stdin.on('data', (data) => {
 })
 
 webApp.listen(port, () => {
-    console.log(`Server listening on port ${port}`)
+    console.log(`[webApp] Server listening on port ${port}`)
 })
 
 client.login(process.env.BOT_TOKEN)
