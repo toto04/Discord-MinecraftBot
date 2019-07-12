@@ -89,8 +89,8 @@ class Server extends EventEmitter {
             // parses useful stuff when the server process outputs something
             data = data.toString()
             this.log(data)
-            if (data.includes('joined') | data.includes('left')) this._updateList()
-            let match = data.match(/\[\d{2}:\d{2}:\d{2}\] \[Server thread\/INFO\]: (?:\[([^\]]+)\]|<([^>]+)>) (.+)/)
+            if (data.includes('joined') || data.includes('left') || data.includes('logged in')) this._updateList()
+            let match = data.match(/\[\d{2}:\d{2}:\d{2}\] (?:\[Server thread\/INFO\]|\[Async Chat Thread - #\d+\/INFO\]): <([^>]+)> (.+)/)
             if (match) {
                 if (match[1]) this.emit('chat', match[1], match[3])
                 else this.emit('chat', match[2], match[3])
