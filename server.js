@@ -77,7 +77,7 @@ class Server extends EventEmitter {
         this.process = cp.spawn(
             // runs the server
             "java",
-            ['-Xms1024M', '-Xmx1024M', '-jar', 'server.jar', 'nogui'],
+            ['-Xms512M', '-Xmx2048M', '-jar', 'server.jar', 'nogui'],
             {
                 cwd: __dirname + '/mcServer'
             }
@@ -92,8 +92,7 @@ class Server extends EventEmitter {
             if (data.includes('joined') || data.includes('left') || data.includes('logged in')) this._updateList()
             let match = data.match(/\[\d{2}:\d{2}:\d{2}\] (?:\[Server thread\/INFO\]|\[Async Chat Thread - #\d+\/INFO\]): <([^>]+)> (.+)/)
             if (match) {
-                if (match[1]) this.emit('chat', match[1], match[3])
-                else this.emit('chat', match[2], match[3])
+                this.emit('chat', match[1], match[2])
             }
             if (data.substring(10, 37) == ' [Server thread/INFO]: Done') this._setStatus('online')
         })
