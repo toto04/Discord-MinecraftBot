@@ -1,6 +1,7 @@
 mcServer*
 .vscode/
 *.DS_Store
+*.js
 
 # Logs
 logs
